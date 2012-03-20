@@ -16,12 +16,21 @@ class Loader():
 		running()
 
 	def showMethods(self,name):
-		## Add a check, if name is empty list all modules and all methods
+		if (name == ''):
+			for i,j in self.modules.iteritems():
 
-		li = dir(self.modules[name])
-		for i in li:
-			if ( i[0:2] != '__' ):
-				print i
+				li = dir(j)
+				print "Module:",i
+				for i in li:
+					if ( i[0:2] != '__' ):
+						print i
+				print ""
+				
+		else:
+			li = dir(self.modules[name])
+			for i in li:
+				if ( i[0:2] != '__' ):
+					print i
 
 	def showMods(self):
 		for i,j in self.modules.iteritems():
