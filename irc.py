@@ -57,29 +57,7 @@ class Irc:
 	#process the irc messages
 	def msgp(self, sender,channel,message):
 		print '(', channel, ')', '[',  sender , ']', ':', message
-		
-		if message.find(self.nick+':') != -1 and len(message.split()) > 1:
-
-			if ( message.split()[1] == 'loader' and sender == self.owner ):
-				if ( message.split()[2] == 'load' ):
-					self.saychan(self.load.loadMod(message.split()[3]),channel)
-				elif ( message.split()[2] == 'reload' ):
-					self.saychan(self.load.reloadMod(message.split()[3]),channel)
-				elif ( message.split()[2] == 'run' ):
-					self.saychan(self.load.runMethod(message.split()[3],message.split()[4],None),channel)
-				elif ( message.split()[2] == 'showmethods' ):
-					self.saychan(self.load.showMethods(''),channel)
-
-			elif ( self.load.modules.has_key(message.split()[1]) and sender == self.owner ):
-				if ( message.split()[2] != None ):
-					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],message.split()[3:len(message.split())]),channel)
-					#self.saychan(self.load.runMethod(
-				else:
-					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],None),channel)
-					## self.saychan("yeah yeah I know some of these words",channel)
-
-			else:
-				self.saychan(message.split()[2],channel)
+		self.saychan(message.split(),channel)
 
 
 	def startIrc(self):
