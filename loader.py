@@ -7,7 +7,7 @@ class Loader():
 	def loadMod(self,name):
 		mod = __import__(name, fromlist=[])
 		self.modules[name] = mod
-		return "Loaded" + name + "Module"
+		return "Loaded " + name + " Module"
 
 	def reloadMod(self,name):
 		reload(self.modules[name])
