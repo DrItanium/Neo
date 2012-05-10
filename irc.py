@@ -8,14 +8,15 @@ class Irc:
 	config.read('config.cfg')
 
 	#Obtain Configuration Vaules
-	port 		= config.get('Settings', 'port')
+	server		= config.get('Settings', 'server')
+	port 		= int(config.get('Settings', 'port'))
 	nick 		= config.get('Settings', 'nick')
-	username 		= config.get('Settings', 'username')
-	password 		= config.get('Settings', 'password')
-	realname 		= config.get('Settings', 'realname')
-	hostname 		= config.get('Settings', 'hostname')
+	username 	= config.get('Settings', 'username')
+	password 	= config.get('Settings', 'password')
+	realname 	= config.get('Settings', 'realname')
+	hostname 	= config.get('Settings', 'hostname')
 	servername 	= config.get('Settings', 'servername')
-	channel 		= config.get('Settings', 'channel')
+	channel 	= config.get('Settings', 'channel')
 	owner 		= config.get('Settings', 'owner')
 	silent 		= config.get('Settings', 'silent')
 	delay 		= config.get('Settings', 'delay')
@@ -27,10 +28,10 @@ class Irc:
 	#init the class
 	def __init__(self, datloader):
 		self.load = datloader
-		
 		## Load Default Modules, Maybe put this into a list?
 		self.load.loadMod('commands')
-		self.load.loadMod('remember')
+		#self.load.loadMod('remember')
+		print "The server is",self.server
 
 	#connect to the server
 	def irc_conn(self):
@@ -54,12 +55,12 @@ class Irc:
 		self.send('PRIVMSG ' + channel + ' :' + str(text) + '\r\n')
 
 	#process the irc messages
-	def msgp(self, sender,destination,message):
-		print '(', destination, ')', '[',  sender , ']', ':', message
+	def msgp(self, sender,channel,message):
+		print '(', channel, ')', '[',  sender , ']', ':', message
 		
 		if message.find(self.nick+':') != -1 and len(message.split()) > 1:
 
-			if ( message.split()[1] == 'loader' and sender == owner ):
+			if ( message.split()[1] == 'loader' and sender == self.owner ):
 				if ( message.split()[2] == 'load' ):
 					self.saychan(self.load.loadMod(message.split()[3]),channel)
 				elif ( message.split()[2] == 'reload' ):
@@ -69,15 +70,16 @@ class Irc:
 				elif ( message.split()[2] == 'showmethods' ):
 					self.saychan(self.load.showMethods(''),channel)
 
-			elif ( self.load.modules.has_key(message.split()[1]) and sender == owner ):
+			elif ( self.load.modules.has_key(message.split()[1]) and sender == self.owner ):
 				if ( message.split()[2] != None ):
 					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],message.split()[3:len(message.split())]),channel)
+					#self.saychan(self.load.runMethod(
 				else:
 					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],None),channel)
 					## self.saychan("yeah yeah I know some of these words",channel)
-				
+
 			else:
-				self.saychan(message.split()[1],channel)
+				self.saychan(message.split()[2],channel)
 
 
 	def startIrc(self):
@@ -97,5 +99,4 @@ class Irc:
 				sender = data.split ( '!' ) [ 0 ].replace ( ':', '' )
 				message = ':'.join ( data.split ( ':' ) [ 2: ] )
 				destination = ''.join ( data.split ( ':' ) [ :2 ] ).split ( ' ' ) [ -2 ]
-				self.load.runMethod('remember','memory',message)
 				self.msgp(sender,destination,message)

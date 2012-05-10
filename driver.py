@@ -1,4 +1,4 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python2.6
 
 from irc import Irc
 from loader import Loader
