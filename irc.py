@@ -1,6 +1,6 @@
 import socket, string, random, time, ConfigParser
 from threading import Timer
-from loader import Loader
+from neoLoader import NeoLoader
 
 class Irc:
 	#Parse Configuration File
@@ -27,10 +27,14 @@ class Irc:
 	
 	#init the class
 	def __init__(self, datloader):
+		## These are crucial modules that you need
+		coreDir = "mods/core/"
+		defaultModules = ['msgproc.py']
 		self.load = datloader
 
 		## Load Default Modules, Maybe put this into a list?
-		#self.load.loadMod('remember')
+		for i in defaultModules:
+			self.load.load(coreDir + i)
 
 	#connect to the server
 	def irc_conn(self):
@@ -56,7 +60,29 @@ class Irc:
 	#process the irc messages
 	def msgp(self, sender,channel,message):
 		print '(', channel, ')', '[',  sender , ']', ':', message
-		self.saychan(message.split(),channel)
+
+		## Check for Admin commands, need to be run here.
+		if ( message[0] == '!' and sender == self.owner ):
+			self.admin(channel,message)
+
+		## Run the input through each of the imported modules
+		else:
+			for mod in self.load.listMods():
+				self.saychan(self.load.run(mod,message),channel)
+
+	def admin(self,channel,message):
+		if (message.split()[0] == "!load"):
+			try:
+				self.load.load(message.split()[1])
+				self.saychan("Loaded " + message.split()[1] + "module." ,channel)
+			except:
+				self.saychan("I accidently the entire." ,channel)
+		elif (message.split()[0] == "!mods"):
+			return 1
+		elif (message.split()[0] == "!silent"):
+			return 1
+		elif (message.split()[0] == "!unsilent"):
+			return 1
 
 	def startIrc(self):
 		

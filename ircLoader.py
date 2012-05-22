@@ -12,9 +12,6 @@ class IrcLoader():
 		name = modPath.split('/')[len(modPath.split('/'))-1]
 		self.modList[name] = self.nl.loadMod(modPath)
 
-	def reload(self):
-		return 1
-
 	def listMods(self):
 		ans = []
 		for i,j in self.modList.iteritems():

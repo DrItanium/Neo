@@ -2,6 +2,7 @@ import imp
 import md5
 import os.path
 import traceback
+import sys
 
 class NeoLoader:
 	def __init__(self):

@@ -1,9 +1,9 @@
 #!/usr/bin/python2.6
 
 from irc import Irc
-from loader import Loader
+from ircLoader import IrcLoader
 
-datloader = Loader()
+datloader = IrcLoader()
 irc = Irc(datloader)
 
 irc.startIrc()
