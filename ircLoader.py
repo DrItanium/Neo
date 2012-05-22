@@ -7,7 +7,8 @@ class IrcLoader():
 
 	def __init__(self):
 		print "Initialized"
-
+	
+	## Uses neoloader to load the modules
 	def load(self, modPath):
 		name = modPath.split('/')[len(modPath.split('/'))-1]
 		self.modList[name] = self.nl.loadMod(modPath)

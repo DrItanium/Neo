@@ -18,7 +18,7 @@ class Irc:
 	servername 	= config.get('Settings', 'servername')
 	channel 	= config.get('Settings', 'channel')
 	owner 		= config.get('Settings', 'owner')
-	silent 		= config.get('Settings', 'silent')
+	silent 		= bool(config.get('Settings', 'silent'))
 	delay 		= config.get('Settings', 'delay')
 	delayTime 	= config.get('Settings', 'delayTime')
 
@@ -53,6 +53,10 @@ class Irc:
 	def join(self,channel):
 		self.send("JOIN %s" % channel)
 
+	#join a channel
+	def part(self,channel):
+		self.send("PART %s" % channel)
+
 	#say into a channel
 	def saychan(self,text,channel):
 		self.send('PRIVMSG ' + channel + ' :' + str(text) + '\r\n')
@@ -67,8 +71,9 @@ class Irc:
 
 		## Run the input through each of the imported modules
 		else:
-			for mod in self.load.listMods():
-				self.saychan(self.load.run(mod,message),channel)
+			if(not self.silent):
+				for mod in self.load.listMods():
+					self.saychan(self.load.run(mod,message),channel)
 
 	def admin(self,channel,message):
 		if (message.split()[0] == "!load"):
@@ -77,12 +82,21 @@ class Irc:
 				self.saychan("Loaded " + message.split()[1] + "module." ,channel)
 			except:
 				self.saychan("I accidently the entire." ,channel)
+
 		elif (message.split()[0] == "!mods"):
-			return 1
+			self.saychan(str(self.load.listMods()),channel)
+
 		elif (message.split()[0] == "!silent"):
-			return 1
+			self.silent = True
+
 		elif (message.split()[0] == "!unsilent"):
-			return 1
+			self.silent = False
+
+		elif (message.split()[0] == "!join"):
+			self.join(message.split()[1])
+
+		elif (message.split()[0] == "!part"):
+			self.part(message.split()[1])
 
 	def startIrc(self):
 		
