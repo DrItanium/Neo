@@ -1,6 +1,6 @@
 import socket, string, random, time, ConfigParser
 from threading import Timer
-from loader import Loader
+from neoLoader import NeoLoader
 
 class Irc:
 	#Parse Configuration File
@@ -8,16 +8,17 @@ class Irc:
 	config.read('config.cfg')
 
 	#Obtain Configuration Vaules
-	port 		= config.get('Settings', 'port')
+	server		= config.get('Settings', 'server')
+	port 		= int(config.get('Settings', 'port'))
 	nick 		= config.get('Settings', 'nick')
-	username 		= config.get('Settings', 'username')
-	password 		= config.get('Settings', 'password')
-	realname 		= config.get('Settings', 'realname')
-	hostname 		= config.get('Settings', 'hostname')
+	username 	= config.get('Settings', 'username')
+	password 	= config.get('Settings', 'password')
+	realname 	= config.get('Settings', 'realname')
+	hostname 	= config.get('Settings', 'hostname')
 	servername 	= config.get('Settings', 'servername')
-	channel 		= config.get('Settings', 'channel')
+	channel 	= config.get('Settings', 'channel')
 	owner 		= config.get('Settings', 'owner')
-	silent 		= config.get('Settings', 'silent')
+	silent 		= bool(config.get('Settings', 'silent'))
 	delay 		= config.get('Settings', 'delay')
 	delayTime 	= config.get('Settings', 'delayTime')
 
@@ -26,11 +27,14 @@ class Irc:
 	
 	#init the class
 	def __init__(self, datloader):
+		## These are crucial modules that you need
+		coreDir = "mods/core/"
+		defaultModules = ['msgproc.py']
 		self.load = datloader
-		
+
 		## Load Default Modules, Maybe put this into a list?
-		self.load.loadMod('commands')
-		self.load.loadMod('remember')
+		for i in defaultModules:
+			self.load.load(coreDir + i)
 
 	#connect to the server
 	def irc_conn(self):
@@ -49,36 +53,50 @@ class Irc:
 	def join(self,channel):
 		self.send("JOIN %s" % channel)
 
+	#join a channel
+	def part(self,channel):
+		self.send("PART %s" % channel)
+
 	#say into a channel
 	def saychan(self,text,channel):
 		self.send('PRIVMSG ' + channel + ' :' + str(text) + '\r\n')
 
 	#process the irc messages
-	def msgp(self, sender,destination,message):
-		print '(', destination, ')', '[',  sender , ']', ':', message
-		
-		if message.find(self.nick+':') != -1 and len(message.split()) > 1:
+	def msgp(self, sender,channel,message):
+		print '(', channel, ')', '[',  sender , ']', ':', message
 
-			if ( message.split()[1] == 'loader' and sender == owner ):
-				if ( message.split()[2] == 'load' ):
-					self.saychan(self.load.loadMod(message.split()[3]),channel)
-				elif ( message.split()[2] == 'reload' ):
-					self.saychan(self.load.reloadMod(message.split()[3]),channel)
-				elif ( message.split()[2] == 'run' ):
-					self.saychan(self.load.runMethod(message.split()[3],message.split()[4],None),channel)
-				elif ( message.split()[2] == 'showmethods' ):
-					self.saychan(self.load.showMethods(''),channel)
+		## Check for Admin commands, need to be run here.
+		if ( message[0] == '!' and sender == self.owner ):
+			self.admin(channel,message)
 
-			elif ( self.load.modules.has_key(message.split()[1]) and sender == owner ):
-				if ( message.split()[2] != None ):
-					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],message.split()[3:len(message.split())]),channel)
-				else:
-					self.saychan(self.load.runMethod(message.split()[1],message.split()[2],None),channel)
-					## self.saychan("yeah yeah I know some of these words",channel)
-				
-			else:
-				self.saychan(message.split()[1],channel)
+		## Run the input through each of the imported modules
+		else:
+			if(not self.silent):
+				for mod in self.load.listMods():
+					self.saychan(self.load.run(mod,message),channel)
 
+	def admin(self,channel,message):
+		if (message.split()[0] == "!load"):
+			try:
+				self.load.load(message.split()[1])
+				self.saychan("Loaded " + message.split()[1] + "module." ,channel)
+			except:
+				self.saychan("I accidently the entire." ,channel)
+
+		elif (message.split()[0] == "!mods"):
+			self.saychan(str(self.load.listMods()),channel)
+
+		elif (message.split()[0] == "!silent"):
+			self.silent = True
+
+		elif (message.split()[0] == "!unsilent"):
+			self.silent = False
+
+		elif (message.split()[0] == "!join"):
+			self.join(message.split()[1])
+
+		elif (message.split()[0] == "!part"):
+			self.part(message.split()[1])
 
 	def startIrc(self):
 		
@@ -97,5 +115,4 @@ class Irc:
 				sender = data.split ( '!' ) [ 0 ].replace ( ':', '' )
 				message = ':'.join ( data.split ( ':' ) [ 2: ] )
 				destination = ''.join ( data.split ( ':' ) [ :2 ] ).split ( ' ' ) [ -2 ]
-				self.load.runMethod('remember','memory',message)
 				self.msgp(sender,destination,message)
