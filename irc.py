@@ -1,6 +1,7 @@
 import socket, string, random, time, ConfigParser
 from threading import Timer
 from neoLoader import NeoLoader
+import os,glob
 
 class Irc:
 	#Parse Configuration File
@@ -29,10 +30,15 @@ class Irc:
 	def __init__(self, datloader):
 		## These are crucial modules that you need
 		coreDir = "mods/core/"
-		defaultModules = ['msgproc.py']
+		defaultModules = []
 		self.load = datloader
 
-		## Load Default Modules, Maybe put this into a list?
+		## Load Core Modules Automatically
+		for infile in glob.glob( os.path.join(coreDir, '*.py') ):
+			print "Loaded " + infile
+			self.load.load(infile)
+
+		## Load Default Modules
 		for i in defaultModules:
 			self.load.load(coreDir + i)
 
