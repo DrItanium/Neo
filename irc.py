@@ -2,6 +2,7 @@ import socket, string, random, time, ConfigParser
 from threading import Timer
 from neoLoader import NeoLoader
 import os,glob
+import traceback,sys
 
 class Irc:
 	#Parse Configuration File
@@ -85,9 +86,18 @@ class Irc:
 		if (message.split()[0] == "!load"):
 			try:
 				self.load.load(message.split()[1])
-				self.saychan("Loaded " + message.split()[1] + "module." ,channel)
+				self.saychan("Loaded " + message.split()[1] + " module." ,channel)
 			except:
 				self.saychan("I accidently the entire." ,channel)
+				traceback.print_exc(file = sys.stderr)
+
+		elif (message.split()[0] == "!unload"):
+			try:
+				self.load.unload(message.split()[1])
+				self.saychan("Unloaded " + message.split()[1] + "module." ,channel)
+			except:
+				self.saychan("I accidently the entire." ,channel)
+				traceback.print_exc(file = sys.stderr)
 
 		elif (message.split()[0] == "!mods"):
 			self.saychan(str(self.load.listMods()),channel)
