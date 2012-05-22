@@ -21,7 +21,6 @@ class Irc:
 	silent 		= config.get('Settings', 'silent')
 	delay 		= config.get('Settings', 'delay')
 	delayTime 	= config.get('Settings', 'delayTime')
-	modDir		= config.get('Settings', 'modDir') + "."
 
 	#setup irc socket
 	irc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -31,7 +30,6 @@ class Irc:
 		self.load = datloader
 
 		## Load Default Modules, Maybe put this into a list?
-		self.load.loadMod(self.modDir+'commands')
 		#self.load.loadMod('remember')
 
 	#connect to the server
@@ -59,7 +57,6 @@ class Irc:
 	def msgp(self, sender,channel,message):
 		print '(', channel, ')', '[',  sender , ']', ':', message
 		self.saychan(message.split(),channel)
-
 
 	def startIrc(self):
 		
