@@ -74,7 +74,7 @@ class Irc:
 		print '(', channel, ')', '[',  sender , ']', ':', message
 
 		## Check for Admin commands, need to be run here.
-		if ( message[0] == '!' and sender == self.owner ):
+		if ( message[0] == '!' and sender in self.owner.split(',') ):
 			self.admin(channel,message)
 
 		## Run the input through each of the imported modules
@@ -138,6 +138,34 @@ class Irc:
 			else:
 				self.verbose = True
 			print "Verbose:",self.verbose
+
+		elif (message.split()[0] == "!admin"):
+			try:
+				if (message.split()[1] == "+"):
+					try:
+						self.owner += "," + message.split()[2]
+					except:
+						self.saychan("Wrong command format." ,channel)
+						traceback.print_exc(file = sys.stderr)
+						
+				elif (message.split()[1] == "-"):
+					try:
+						self.owner = self.owner.replace(message.split()[2],'')
+					except:
+						self.saychan("Wrong command format." ,channel)
+						traceback.print_exc(file = sys.stderr)
+
+				elif (message.split()[1] == "default"):
+					try:
+						self.owner = self.config.get('Settings', 'owner')
+					except:
+						self.saychan("Wrong command format." ,channel)
+						traceback.print_exc(file = sys.stderr)
+
+			except:
+				self.saychan("Wrong command format." ,channel)
+				traceback.print_exc(file = sys.stderr)
+				
 
 
 	def startIrc(self):
