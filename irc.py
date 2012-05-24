@@ -48,6 +48,10 @@ class Irc:
 		## Get start time for uptime command
 		self.startTime = datetime.now()
 
+		## Channel list, if the chan is in the list, girldius is silent. 
+		## Is checked AFTER global silence
+		self.silentChan = []
+
 	#connect to the server
 	def irc_conn(self):
 		self.irc.connect((self.server,self.port))
@@ -86,7 +90,7 @@ class Irc:
 
 		## Run the input through each of the imported modules
 		else:
-			if(not self.silent and not self.delay):
+			if(not self.silent and not self.delay and self.silentChan.count(channel) == 0):
 				## Set the timer that resets the delay from true to false
 				self.delay = True
 				t = Timer(self.delayTime,self.delaySet)
@@ -141,10 +145,29 @@ class Irc:
 				self.reportError(channel)
 
 		elif (message.split()[0] == "!silent"):
-			if (self.silent == True):
-				self.silent = False
-			else:
-				self.silent = True
+			try:
+				if (message.split()[1] == "+"):
+					try:
+						self.silentChan.append(message.split()[2])
+					except:
+						self.reportError(channel)
+						
+				elif (message.split()[1] == "-"):
+					try:
+						self.silentChan.remove(message.split()[2])
+					except:
+						self.reportError(channel)
+
+				elif (message.split()[1] == "clear"):
+					try:
+						self.silentChan = []
+					except:
+						self.reportError(channel)
+			except:
+				if (self.silent == True):
+					self.silent = False
+				else:
+					self.silent = True
 
 		elif (message.split()[0] == "!join"):
 			try:
