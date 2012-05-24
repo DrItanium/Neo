@@ -81,7 +81,11 @@ class Irc:
 		else:
 			if(not self.silent):
 				for mod in self.load.listMods():
-					self.saychan(self.load.run(mod,message),channel)
+					try:
+						self.saychan(self.load.run(mod,message,sender),channel)
+					except:
+						self.saychan("Hey something's broken in "+str(mod) ,channel)
+						traceback.print_exc(file = sys.stderr)
 
 	## Admin ! commands
 	def admin(self,channel,message):

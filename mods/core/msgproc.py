@@ -5,8 +5,9 @@ name = "msgproc.py"
 
 ## What the module should return when processing text from IRC
 ## Gets inp from IRC, processes it, and returns the 
-def run(inp):
-	return "This was your input " + inp.split()[0]
+def run(inp,sender):
+	## return "" + inp.split()[0]
+	return ""
 
 ## Returns a description of the module including the name at the top
 def desc():
