@@ -120,10 +120,10 @@ class Irc:
 				traceback.print_exc(file = sys.stderr)
 
 		elif (message.split()[0] == "!silent"):
-			self.silent = True
-
-		elif (message.split()[0] == "!unsilent"):
-			self.silent = False
+			if (self.silent == True):
+				self.silent = False
+			else:
+				self.silent = True
 
 		elif (message.split()[0] == "!join"):
 			self.join(message.split()[1])
