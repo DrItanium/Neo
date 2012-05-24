@@ -1,6 +1,7 @@
 import socket, string, random, time, ConfigParser
 from threading import Timer
 from neoLoader import NeoLoader
+from datetime import datetime
 import os,glob
 import traceback,sys
 
@@ -43,6 +44,9 @@ class Irc:
 		## Load Default Modules
 		for i in defaultModules:
 			self.load.load(coreDir + i)
+
+		## Get start time for uptime command
+		startTime = datetime.now()
 
 	#connect to the server
 	def irc_conn(self):
@@ -94,20 +98,14 @@ class Irc:
 				self.load.load(message.split()[1])
 				self.saychan("Loaded " + message.split()[1] + " module." ,channel)
 			except:
-				if (self.verbose):
-					self.saychan("Error: "+str(sys.exc_info()[1]),channel)
-				else:
-					self.saychan("I accidently the entire.",channel)
-
-				traceback.print_exc(file = sys.stderr)
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!unload"):
 			try:
 				self.load.unload(message.split()[1])
 				self.saychan("Unloaded " + message.split()[1] + "module." ,channel)
 			except:
-				self.saychan("I accidently the entire." ,channel)
-				traceback.print_exc(file = sys.stderr)
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!mods"):
 			self.saychan(str(self.load.listMods()),channel)
@@ -116,8 +114,7 @@ class Irc:
 			try:
 				self.saychan(str(self.load.desc(message.split()[1])),channel)
 			except:
-				self.saychan("I accidently the entire." ,channel)
-				traceback.print_exc(file = sys.stderr)
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!silent"):
 			if (self.silent == True):
@@ -129,15 +126,13 @@ class Irc:
 			try:
 				self.join(message.split()[1])
 			except:
-				self.saychan("Wrong command format." ,channel)
-				traceback.print_exc(file = sys.stderr)
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!part"):
 			try:
 				self.part(message.split()[1])
 			except:
-				self.saychan("Wrong command format." ,channel)
-				traceback.print_exc(file = sys.stderr)
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!verbose"):
 			print "Verbose:",self.delay
@@ -146,6 +141,17 @@ class Irc:
 			else:
 				self.verbose = True
 			print "Verbose:",self.verbose
+		
+		elif (message.split()[0] == "!uptime"):
+			try:
+				diff = datetime.now() - self.startTime
+				hours, remainder = divmod(diff, 3600)
+				minutes, seconds = divmod(remainder, 60)
+				ans =  '%s hours %s minutes %s seconds' % (hours, minutes, seconds)
+				print ans
+				return ans
+			except:
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!admin"):
 			try:
@@ -153,28 +159,29 @@ class Irc:
 					try:
 						self.owner += "," + message.split()[2]
 					except:
-						self.saychan("Wrong command format." ,channel)
-						traceback.print_exc(file = sys.stderr)
+						self.reportError(channel)
 						
 				elif (message.split()[1] == "-"):
 					try:
 						self.owner = self.owner.replace(message.split()[2],'')
 					except:
-						self.saychan("Wrong command format." ,channel)
-						traceback.print_exc(file = sys.stderr)
+						self.reportError(channel)
 
 				elif (message.split()[1] == "default"):
 					try:
 						self.owner = self.config.get('Settings', 'owner')
 					except:
-						self.saychan("Wrong command format." ,channel)
-						traceback.print_exc(file = sys.stderr)
-
+						self.reportError(channel)
 			except:
-				self.saychan("Wrong command format." ,channel)
-				traceback.print_exc(file = sys.stderr)
-				
+				self.reportError(channel)
 
+	def reportError(self,channel):
+		if (self.verbose):
+			self.saychan("Error: "+str(sys.exc_info()[1]),channel)
+		else:
+			self.saychan("I accidently the entire.",channel)
+
+		traceback.print_exc(file = sys.stderr)
 
 	def startIrc(self):
 		
