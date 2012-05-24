@@ -46,7 +46,7 @@ class Irc:
 			self.load.load(coreDir + i)
 
 		## Get start time for uptime command
-		startTime = datetime.now()
+		self.startTime = datetime.now()
 
 	#connect to the server
 	def irc_conn(self):
@@ -145,11 +145,11 @@ class Irc:
 		elif (message.split()[0] == "!uptime"):
 			try:
 				diff = datetime.now() - self.startTime
-				hours, remainder = divmod(diff, 3600)
+				hours, remainder = divmod(diff.seconds, 3600)
 				minutes, seconds = divmod(remainder, 60)
 				ans =  '%s hours %s minutes %s seconds' % (hours, minutes, seconds)
 				print ans
-				return ans
+				self.saychan(ans,channel)
 			except:
 				self.reportError(channel)
 
