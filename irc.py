@@ -23,7 +23,7 @@ class Irc:
 	owner 		= config.get('Settings', 'owner')
 	silent 		= config.getboolean('Settings', 'silent')
 	delay 		= config.getboolean('Settings', 'delay')
-	delayTime 	= config.get('Settings', 'delayTime')
+	delayTime 	= config.getint('Settings', 'delayTime')
 	verbose 	= config.getboolean('Settings', 'verbose')
 
 	#setup irc socket
@@ -51,6 +51,9 @@ class Irc:
 	#connect to the server
 	def irc_conn(self):
 		self.irc.connect((self.server,self.port))
+	
+	def delaySet(self):
+		self.delay = False
 
 	#send raw data through the socket created
 	def send(self,cmd):
@@ -83,7 +86,12 @@ class Irc:
 
 		## Run the input through each of the imported modules
 		else:
-			if(not self.silent):
+			if(not self.silent and not self.delay):
+				## Set the timer that resets the delay from true to false
+				self.delay = True
+				t = Timer(self.delayTime,self.delaySet)
+				t.start()
+
 				for mod in self.load.listMods():
 					try:
 						self.saychan(self.load.run(mod,message,sender),channel)
@@ -108,7 +116,23 @@ class Irc:
 				self.reportError(channel)
 
 		elif (message.split()[0] == "!mods"):
-			self.saychan(str(self.load.listMods()),channel)
+			ans = ""
+			try:
+				if ( message.split()[1] == "running" ):
+					self.saychan(str(self.load.listMods()),channel)
+				if ( message.split()[1] == "all" ):
+					for infile in glob.glob( os.path.join('mods/', '*.py') ):
+						ans += str(infile) + " "
+					self.saychan(ans,channel)
+
+			except:
+				self.reportError(channel)
+
+		elif (message.split()[0] == "!delay"):
+			try:
+				self.delayTime = int(message.split()[1])
+			except:
+				self.reportError(channel)
 
 		elif (message.split()[0] == "!desc"):
 			try:
@@ -135,12 +159,10 @@ class Irc:
 				self.reportError(channel)
 
 		elif (message.split()[0] == "!verbose"):
-			print "Verbose:",self.delay
 			if (self.verbose):
 				self.verbose = False
 			else:
 				self.verbose = True
-			print "Verbose:",self.verbose
 		
 		elif (message.split()[0] == "!uptime"):
 			try:
