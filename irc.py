@@ -126,10 +126,18 @@ class Irc:
 				self.silent = True
 
 		elif (message.split()[0] == "!join"):
-			self.join(message.split()[1])
+			try:
+				self.join(message.split()[1])
+			except:
+				self.saychan("Wrong command format." ,channel)
+				traceback.print_exc(file = sys.stderr)
 
 		elif (message.split()[0] == "!part"):
-			self.part(message.split()[1])
+			try:
+				self.part(message.split()[1])
+			except:
+				self.saychan("Wrong command format." ,channel)
+				traceback.print_exc(file = sys.stderr)
 
 		elif (message.split()[0] == "!verbose"):
 			print "Verbose:",self.delay
