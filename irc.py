@@ -20,9 +20,10 @@ class Irc:
 	servername 	= config.get('Settings', 'servername')
 	channel 	= config.get('Settings', 'channel')
 	owner 		= config.get('Settings', 'owner')
-	silent 		= bool(config.get('Settings', 'silent'))
-	delay 		= config.get('Settings', 'delay')
+	silent 		= config.getboolean('Settings', 'silent')
+	delay 		= config.getboolean('Settings', 'delay')
 	delayTime 	= config.get('Settings', 'delayTime')
+	verbose 	= config.getboolean('Settings', 'verbose')
 
 	#setup irc socket
 	irc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -82,13 +83,18 @@ class Irc:
 				for mod in self.load.listMods():
 					self.saychan(self.load.run(mod,message),channel)
 
+	## Admin ! commands
 	def admin(self,channel,message):
 		if (message.split()[0] == "!load"):
 			try:
 				self.load.load(message.split()[1])
 				self.saychan("Loaded " + message.split()[1] + " module." ,channel)
 			except:
-				self.saychan("I accidently the entire." ,channel)
+				if (self.verbose):
+					self.saychan("Error: "+str(sys.exc_info()[1]),channel)
+				else:
+					self.saychan("I accidently the entire.",channel)
+
 				traceback.print_exc(file = sys.stderr)
 
 		elif (message.split()[0] == "!unload"):
@@ -102,6 +108,13 @@ class Irc:
 		elif (message.split()[0] == "!mods"):
 			self.saychan(str(self.load.listMods()),channel)
 
+		elif (message.split()[0] == "!desc"):
+			try:
+				self.saychan(str(self.load.desc(message.split()[1])),channel)
+			except:
+				self.saychan("I accidently the entire." ,channel)
+				traceback.print_exc(file = sys.stderr)
+
 		elif (message.split()[0] == "!silent"):
 			self.silent = True
 
@@ -113,6 +126,15 @@ class Irc:
 
 		elif (message.split()[0] == "!part"):
 			self.part(message.split()[1])
+
+		elif (message.split()[0] == "!verbose"):
+			print "Verbose:",self.delay
+			if (self.verbose):
+				self.verbose = False
+			else:
+				self.verbose = True
+			print "Verbose:",self.verbose
+
 
 	def startIrc(self):
 		

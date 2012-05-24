@@ -10,5 +10,5 @@ def run(inp):
 
 ## Returns a description of the module including the name at the top
 def desc():
-	return "Module name" + name + "Example Description"
+	return "Example Description"
 
