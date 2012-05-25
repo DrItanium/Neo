@@ -14,7 +14,7 @@ def run(inp,sender):
 	if ( inp == "what do you give a bitch?" ):
 		return 'GIVE THE BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
 	else:
-		print "in the if"
+		print inp
 		return ""
 
 ## Returns a description of the module including the name at the top
