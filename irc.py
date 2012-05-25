@@ -35,6 +35,7 @@ class Irc:
 		coreDir = "mods/core/"
 		defaultModules = []
 		self.load = datloader
+		self.ircRaw = options.raw
 
 		## Load Core Modules Automatically
 		for infile in glob.glob( os.path.join(coreDir, '*.py') ):
@@ -82,7 +83,8 @@ class Irc:
 
 	#process the irc messages
 	def msgp(self, sender,channel,message):
-		print '(', channel, ')', '[',  sender , ']', ':', message
+		if (not self.ircRaw):
+			print '(', channel, ')', '[',  sender , ']', ':', message
 
 		## Check for Admin commands, need to be run here.
 		if ( message[0] == '!' and sender in self.owner.split(',') ):
@@ -247,6 +249,9 @@ class Irc:
 				#saychan('I sent a pong with data: ' + data, '#testgradius')
 
 			elif data.find('PRIVMSG') != -1:
+				if self.ircRaw:
+					print data
+
 				sender = data.split ( '!' ) [ 0 ].replace ( ':', '' )
 				message = ':'.join ( data.split ( ':' ) [ 2: ] )
 				destination = ''.join ( data.split ( ':' ) [ :2 ] ).split ( ' ' ) [ -2 ]
