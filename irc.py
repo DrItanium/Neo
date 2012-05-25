@@ -30,7 +30,7 @@ class Irc:
 	irc = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	
 	#init the class
-	def __init__(self, datloader):
+	def __init__(self, datloader,options):
 		## These are crucial modules that you need
 		coreDir = "mods/core/"
 		defaultModules = []
