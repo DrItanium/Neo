@@ -12,9 +12,9 @@ def run(inp,sender):
 	gift = random.choice(words).upper()
 
 	if ( inp == "what do you give a bitch?" ):
-		print "in the if"
 		return 'GIVE THE BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
 	else:
+		print "in the if"
 		return ""
 
 ## Returns a description of the module including the name at the top
