@@ -8,7 +8,7 @@ name = "giveabitch.py"
 ## Gets inp from IRC, processes it, and returns the 
 def run(inp,sender):
 
-	words = [line.strip() for line in open('items.dic')]
+	words = [line.strip() for line in open('mods/items.dic')]
 	gift = random.choice(words).upper()
 	if ( inp == "what do you give a bitch?" ):
 		return 'GIVE THE BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
