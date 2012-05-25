@@ -91,14 +91,17 @@ class Irc:
 		## Run the input through each of the imported modules
 		else:
 			if(not self.silent and not self.delay and self.silentChan.count(channel) == 0):
-				## Set the timer that resets the delay from true to false
-				self.delay = True
-				t = Timer(self.delayTime,self.delaySet)
-				t.start()
 
 				for mod in self.load.listMods():
 					try:
-						self.saychan(self.load.run(mod,message,sender),channel)
+						ans = self.load.run(mod,message,sender,channel)
+						if (ans != ""):
+							self.saychan(ans,channel)
+							## Set the timer that resets the delay from true to false
+							self.delay = True
+							t = Timer(self.delayTime,self.delaySet)
+							t.start()
+							print "Delayed:",self.delayTime
 					except:
 						self.saychan("Hey something's broken in "+str(mod) ,channel)
 						traceback.print_exc(file = sys.stderr)
@@ -166,8 +169,10 @@ class Irc:
 			except:
 				if (self.silent == True):
 					self.silent = False
+					print "Silent:False"
 				else:
 					self.silent = True
+					print "Silent:True"
 
 		elif (message.split()[0] == "!join"):
 			try:

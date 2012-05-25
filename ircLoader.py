@@ -22,7 +22,7 @@ class IrcLoader():
 			ans.append(i)
 		return ans
 	
-	def run(self,module,inp,sender):
+	def run(self,module,inp,sender,channel):
 		## Runs the run method for the module
 		return self.modList[module].run(inp,sender)
 

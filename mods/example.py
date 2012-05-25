@@ -5,7 +5,7 @@ name = "Example.py"
 
 ## What the module should return when processing text from IRC
 ## Gets inp from IRC, processes it, and returns the 
-def run(inp,sender):
+def run(inp,sender,channel):
 	return sender + " This was your input " + inp
 
 ## Returns a description of the module including the name at the top

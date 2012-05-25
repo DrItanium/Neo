@@ -6,7 +6,7 @@ name = "giveabitch.py"
 
 ## What the module should return when processing text from IRC
 ## Gets inp from IRC, processes it, and returns the 
-def run(inp,sender):
+def run(inp,sender,channel):
 
 	words = [line.strip() for line in open('mods/items.dic')]
 	gift = random.choice(words).upper()
