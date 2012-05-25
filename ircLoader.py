@@ -24,7 +24,7 @@ class IrcLoader():
 	
 	def run(self,module,inp,sender,channel):
 		## Runs the run method for the module
-		return self.modList[module].run(inp,sender)
+		return self.modList[module].run(inp,sender,channel)
 
 	def desc(self,module):
 		## Runs the desc method for the module
