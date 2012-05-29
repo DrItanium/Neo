@@ -81,10 +81,14 @@ class Irc:
 	def saychan(self,text,channel):
 		self.send('PRIVMSG ' + channel + ' :' + str(text) + '\r\n')
 
+	#process the PMs
+	def pmproc(self,sender,message):
+		self.msgp(sender,sender,message,True)
+
 	#process the irc messages
-	def msgp(self, sender,channel,message):
+	def msgp(self, sender,channel,message,isPM):
 		if (not self.ircRaw):
-			print '(', channel, ')', '[',  sender , ']', ':', message
+			print '[', channel, ']', sender ,':', message
 
 		## Check for Admin commands, need to be run here.
 		if ( message[0] == '!' and sender in self.owner.split(',') ):
@@ -99,11 +103,15 @@ class Irc:
 						ans = self.load.run(mod,message,sender,channel)
 						if (ans != ""):
 							self.saychan(ans,channel)
+
 							## Set the timer that resets the delay from true to false
-							self.delay = True
-							t = Timer(self.delayTime,self.delaySet)
-							t.start()
-							print "Delayed:",self.delayTime
+							## Don't delay in PMs
+							if (not isPM):
+								self.delay = True
+								t = Timer(self.delayTime,self.delaySet)
+								t.start()
+								print "Delayed:",self.delayTime
+
 					except:
 						self.saychan("Hey something's broken in "+str(mod) ,channel)
 						traceback.print_exc(file = sys.stderr)
@@ -210,12 +218,14 @@ class Irc:
 				if (message.split()[1] == "+"):
 					try:
 						self.owner += "," + message.split()[2]
+						print "Owner",message.split()[2],"added."
 					except:
 						self.reportError(channel)
 						
 				elif (message.split()[1] == "-"):
 					try:
 						self.owner = self.owner.replace(message.split()[2],'')
+						print "Owner",message.split()[2],"removed."
 					except:
 						self.reportError(channel)
 
@@ -255,4 +265,9 @@ class Irc:
 				sender = data.split ( '!' ) [ 0 ].replace ( ':', '' )
 				message = ':'.join ( data.split ( ':' ) [ 2: ] )
 				destination = ''.join ( data.split ( ':' ) [ :2 ] ).split ( ' ' ) [ -2 ]
-				self.msgp(sender,destination,message)
+
+				if ( destination == self.nick ):
+					self.pmproc(sender,message)
+
+				if (not destination == self.nick):
+					self.msgp(sender,destination,message,False)
