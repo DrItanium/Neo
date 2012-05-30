@@ -11,7 +11,7 @@ def run(inp,sender,channel):
 	words = [line.strip() for line in open('mods/items.dic')]
 	gift = random.choice(words).upper()
 
-	if ("what do you give a bitch?" in inp):
+	if ("what do you give a bitch?" in inp or "what do you give dandylion?" in inp):
 		return 'GIVE THE BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
 	else:
 		return ""
