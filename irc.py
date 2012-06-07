@@ -205,9 +205,10 @@ class Irc:
 		elif (message.split()[0] == "!uptime"):
 			try:
 				diff = datetime.now() - self.startTime
+				days = diff.days
 				hours, remainder = divmod(diff.seconds, 3600)
 				minutes, seconds = divmod(remainder, 60)
-				ans =  '%s hours %s minutes %s seconds' % (hours, minutes, seconds)
+				ans =  '%s days %s hours %s minutes %s seconds' % (days,hours, minutes, seconds)
 				print ans
 				self.saychan(ans,channel)
 			except:

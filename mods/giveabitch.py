@@ -12,7 +12,7 @@ def run(inp,sender,channel):
 	gift = random.choice(words).upper()
 
 	if ("what do you give a bitch?" in inp or "what do you give dandylion?" in inp):
-		return 'GIVE THE BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
+		return 'GIVE THAT BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
 	else:
 		return ""
 
