@@ -10,7 +10,10 @@ def run(inp,sender,channel):
 
 	words = [line.strip() for line in open('mods/items.dic')]
 	gift = random.choice(words).upper()
-
+	## This could really be simplified
+	## In clips it would be (using my objects)
+	## (object (is-a Hint) (Type Statement) (Contents What|what do you give $? bitch|dandylion ?))
+	## =>
 	if ("what do you give a bitch?" in inp or "what do you give dandylion?" in inp):
 		return 'GIVE THAT BITCH A ' + gift + '. BITCHES LOVE ' + gift + 'S.'
 	else:

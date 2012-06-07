@@ -12,6 +12,7 @@ class NeoLoader:
 	def loadMod(self,path):
 		try:
 			try:
+				## Where are these being used code_dir, code_file?
 				code_dir = os.path.dirname(path)
 				code_file = os.path.basename(path)
 
