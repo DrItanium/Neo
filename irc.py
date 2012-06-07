@@ -118,60 +118,66 @@ class Irc:
 
 	## Admin ! commands
 	def admin(self,channel,message):
-		if (message.split()[0] == "!load"):
+		split = message.split()
+		cmd = split[0]
+		if( split[0] != '!'):
+			return
+		arg = split[1]
+		if (cmd == "!load"):
 			try:
-				self.load.load(message.split()[1])
-				self.saychan("Loaded " + message.split()[1] + " module." ,channel)
+				self.load.load(arg)
+				self.saychan("Loaded " + arg + " module." ,channel)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!unload"):
+		elif (cmd == "!unload"):
 			try:
-				self.load.unload(message.split()[1])
-				self.saychan("Unloaded " + message.split()[1] + "module." ,channel)
+				self.load.unload(arg)
+				self.saychan("Unloaded " + arg + "module." ,channel)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!mods"):
+		elif (cmd == "!mods"):
 			ans = ""
 			try:
-				if ( message.split()[1] == "running" ):
+				if ( arg == "running" ):
 					self.saychan(str(self.load.listMods()),channel)
-				if ( message.split()[1] == "all" ):
+				elif ( arg == "all" ):
 					for infile in glob.glob( os.path.join('mods/', '*.py') ):
 						ans += str(infile) + " "
 					self.saychan(ans,channel)
-
+				else:
+					self.saychan("Silly Bear! I have no idea what you're trying to do to my modules.")
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!delay"):
+		elif (cmd == "!delay"):
 			try:
-				self.delayTime = int(message.split()[1])
+				self.delayTime = int(arg)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!desc"):
+		elif (cmd  == "!desc"):
 			try:
-				self.saychan(str(self.load.desc(message.split()[1])),channel)
+				self.saychan(str(self.load.desc(arg),channel)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!silent"):
+		elif (cmd == "!silent"):
 			try:
-				if (message.split()[1] == "+"):
+				if (arg == "+"):
 					try:
-						self.silentChan.append(message.split()[2])
+						self.silentChan.append(split[2])
 					except:
 						self.reportError(channel)
 						
-				elif (message.split()[1] == "-"):
+				elif (arg == "-"):
 					try:
-						self.silentChan.remove(message.split()[2])
+						self.silentChan.remove(split[2])
 					except:
 						self.reportError(channel)
 
-				elif (message.split()[1] == "clear"):
+				elif (arg == "clear"):
 					try:
 						self.silentChan = []
 					except:
@@ -184,25 +190,21 @@ class Irc:
 					self.silent = True
 					print "Silent:True"
 
-		elif (message.split()[0] == "!join"):
+		elif (cmd == "!join"):
 			try:
-				self.join(message.split()[1])
+				self.join(arg)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!part"):
+		elif (cmd == "!part"):
 			try:
-				self.part(message.split()[1])
+				self.part(arg)
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!verbose"):
-			if (self.verbose):
-				self.verbose = False
-			else:
-				self.verbose = True
-		
-		elif (message.split()[0] == "!uptime"):
+		elif (cmd == "!verbose"):
+			self.verbose = not self.verbose
+		elif (cmd == "!uptime"):
 			try:
 				diff = datetime.now() - self.startTime
 				days = diff.days
@@ -214,23 +216,24 @@ class Irc:
 			except:
 				self.reportError(channel)
 
-		elif (message.split()[0] == "!admin"):
+		elif (cmd == "!admin"):
 			try:
-				if (message.split()[1] == "+"):
+				if (arg == "+"):
 					try:
-						self.owner += "," + message.split()[2]
-						print "Owner",message.split()[2],"added."
+						self.owner += "," + split[2]
+						print "Owner",split[2],"added."
 					except:
 						self.reportError(channel)
 						
-				elif (message.split()[1] == "-"):
+				elif (arg == "-"):
 					try:
-						self.owner = self.owner.replace(message.split()[2],'')
-						print "Owner",message.split()[2],"removed."
+						arg2 = split[2]
+						self.owner = self.owner.replace(arg2,'')
+						print "Owner",arg2,"removed."
 					except:
 						self.reportError(channel)
 
-				elif (message.split()[1] == "default"):
+				elif (arg == "default"):
 					try:
 						self.owner = self.config.get('Settings', 'owner')
 					except:
