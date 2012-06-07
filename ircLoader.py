@@ -10,7 +10,8 @@ class IrcLoader():
 	
 	## Uses neoloader to load the modules
 	def load(self, modPath):
-		name = modPath.split('/')[len(modPath.split('/'))-1]
+		split = modPath.split('/')
+		name = split[len(split) - 1]
 		self.modList[name] = self.nl.loadMod(modPath)
 
 	def unload(self,name):
