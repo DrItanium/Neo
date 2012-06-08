@@ -120,7 +120,9 @@ class Irc:
 	def admin(self,channel,message):
 		split = message.split()
 		cmd = split[0]
-		arg = split[1]
+		arg = ""
+		if ( len(split) > 1 ):
+			arg = split[1]
 		if (cmd == "!load"):
 			try:
 				self.load.load(arg)
